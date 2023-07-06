@@ -8,11 +8,14 @@ namespace Seablade.SLR {
 
     [SerializeField] float _jumpHeight = 4f;
     [SerializeField] float _timeToJumpApex = 0.4f;
+    float _accelerationTimeAirborne = 0.2f;
+    float _accelerationTimeGrounded = 0.1f;
     [SerializeField] float _moveSpeed = 6f;
 
     float _gravity;
     float _jumpVelocity;
     Vector3 _velocity;
+    float _velocityXSmoothing;
 
     SLRController2D _controller;
 
@@ -38,7 +41,8 @@ namespace Seablade.SLR {
         _velocity.y = _jumpVelocity;
       }
 
-      _velocity.x = input.x * _moveSpeed;
+      float targetVelocityX = input.x * _moveSpeed;
+      _velocity.x = Mathf.SmoothDamp(_velocity.x, targetVelocityX, ref _velocityXSmoothing, _controller.Collisions.Below ? _accelerationTimeGrounded : _accelerationTimeAirborne);
       _velocity.y += _gravity * Time.fixedDeltaTime;
       // TODO pull Time.fixedDeltaTime into a variable (below is the second usage)
       _controller.Move(_velocity * Time.fixedDeltaTime);

@@ -6,7 +6,7 @@ namespace Seablade.SLF {
     [SerializeField] float _jumpHeight = 4f;
     [SerializeField] float _timeToJumpApex = 0.4f;
     float _accelerationTimeAirborne = 0.2f;
-    float _accelerationTimeGrounded = 0.05f;
+    float _accelerationTimeGrounded = 0.1f;
     [SerializeField] float _moveSpeed = 6f;
 
     float _gravity;
