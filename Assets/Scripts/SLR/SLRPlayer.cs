@@ -14,12 +14,13 @@ namespace Seablade.SLR {
       _controller = GetComponent<SLRController2D>();
     }
 
-    void Update() {
+    void FixedUpdate() {
       Vector2 input = new Vector2(Input.GetAxisRaw("Horizontal"), Input.GetAxisRaw("Vertical"));
 
       _velocity.x = input.x * _moveSpeed;
-      _velocity.y += _gravity * Time.deltaTime;
-      _controller.Move(_velocity * Time.deltaTime);
+      _velocity.y += _gravity * Time.fixedDeltaTime;
+      // TODO pull Time.deltaTime into a variable (below is the second usage)
+      _controller.Move(_velocity * Time.fixedDeltaTime);
     }
   }
 }
