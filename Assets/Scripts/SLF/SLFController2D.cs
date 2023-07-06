@@ -70,24 +70,27 @@ namespace Seablade.SLF {
             ClimbSlope(ref velocity, slopeAngle);
           }
 
-          // move to contact position ?
-          //
-          // TODO i think this is still handling things as velocity, which works good for
-          // translating the code to integrate with unity physics2D (it would be bad if moving into
-          // contact position was handled by setting position directly because this is what causes
-          // rigidbody2D to be unaware of collisions.
-          //
-          // worth noting that this code theoretically won't be needed since moving to contact
-          // position should be handled by
-          velocity.x = (hit.distance - _skinWidth) * directionX;
-          // if we're raycasting to the right, and the player is facing some stairs to an upper
-          // floor, the ray length should continually update to match the minimum hit distance so
-          // the player "stops at the lower stair" on the staircase
-          rayLength = hit.distance;
+          // SebLague: "only check the remaining rays for collisions if we are not climbing a slope"
+          if (!Collisions.ClimbingSlope || slopeAngle > _maxClimbAngle) {
+            // move to contact position ?
+            //
+            // TODO i think this is still handling things as velocity, which works good for
+            // translating the code to integrate with unity physics2D (it would be bad if moving into
+            // contact position was handled by setting position directly because this is what causes
+            // rigidbody2D to be unaware of collisions.
+            //
+            // worth noting that this code theoretically won't be needed since moving to contact
+            // position should be handled by
+            velocity.x = (hit.distance - _skinWidth) * directionX;
+            // if we're raycasting to the right, and the player is facing some stairs to an upper
+            // floor, the ray length should continually update to match the minimum hit distance so
+            // the player "stops at the lower stair" on the staircase
+            rayLength = hit.distance;
 
-          // TODO consider if-statement here instead
-          Collisions.Left = directionX == -1;
-          Collisions.Right = directionX == 1;
+            // TODO consider if-statement here instead
+            Collisions.Left = directionX == -1;
+            Collisions.Right = directionX == 1;
+          }
         }
       }
     }
@@ -135,8 +138,18 @@ namespace Seablade.SLF {
 
     void ClimbSlope(ref Vector3 velocity, float slopeAngle) {
       float moveDistance = Mathf.Abs(velocity.x);
-      velocity.y = Mathf.Sin(slopeAngle * Mathf.Deg2Rad) * moveDistance;
-      velocity.x = Mathf.Cos(slopeAngle * Mathf.Deg2Rad) * moveDistance * Mathf.Sign(velocity.x);
+      float climbVelocityY = Mathf.Sin(slopeAngle * Mathf.Deg2Rad) * moveDistance;
+
+      // check that we're not jumping
+      if (velocity.y <= climbVelocityY) {
+        velocity.y = climbVelocityY;
+        velocity.x = Mathf.Cos(slopeAngle * Mathf.Deg2Rad) * moveDistance * Mathf.Sign(velocity.x);
+        // TODO also check if ClimbingSlope gets set properly on gentle slopes...
+        // TODO oof so mutable (fixes "cannot jump on slopes" bug)
+        Collisions.Below = true;
+        Collisions.ClimbingSlope = true;
+        Collisions.SlopeAngle = slopeAngle;
+      }
     }
 
     void UpdateRaycastOrigins() {
@@ -167,17 +180,27 @@ namespace Seablade.SLF {
       public Vector2 BottomRight;
     }
 
+    // TODO these field names are pretty inconsistent
     public struct CollisionInfo {
       public bool Above;
       public bool Below;
       public bool Left;
       public bool Right;
 
+      public bool ClimbingSlope;
+      public float SlopeAngle, SlopeAngleOld;
+
       public void Reset() {
         Above = false;
         Below = false;
         Left = false;
         Right = false;
+        ClimbingSlope = false;
+
+        // TODO ugh...maybe this method should not be called Reset() but rather Update() or
+        // FixedUpdate()
+        SlopeAngleOld = SlopeAngle;
+        SlopeAngle = 0f;
       }
     }
   }
