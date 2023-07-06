@@ -12,6 +12,8 @@ namespace Seablade.SLR {
     [SerializeField] int _horizontalRayCount = 4;
     [SerializeField] int _verticalRayCount = 4;
 
+    float _maxClimbAngle = 80f;
+
     float _horizontalRaySpacing;
     float _verticalRaySpacing;
 
@@ -61,6 +63,12 @@ namespace Seablade.SLR {
         Debug.DrawRay(rayOrigin, Vector2.right * directionX * rayLength, Color.red);
 
         if (hit) {
+          // TODO only calculate slopeAngle if i == 0 maybe
+          float slopeAngle = Vector2.Angle(hit.normal, Vector2.up);
+          if (i == 0 && slopeAngle <= _maxClimbAngle) {
+            ClimbSlope(ref velocity, slopeAngle);
+          }
+
           // move to contact position ?
           //
           // TODO i think this is still handling things as velocity, which works good for
@@ -122,6 +130,12 @@ namespace Seablade.SLR {
           Collisions.Above = directionY == 1;
         }
       }
+    }
+
+    void ClimbSlope(ref Vector3 velocity, float slopeAngle) {
+      float moveDistance = Mathf.Abs(velocity.x);
+      velocity.y = Mathf.Sin(slopeAngle * Mathf.Deg2Rad) * moveDistance;
+      velocity.x = Mathf.Cos(slopeAngle * Mathf.Deg2Rad) * moveDistance * Mathf.Sign(velocity.x);
     }
 
     void UpdateRaycastOrigins() {
