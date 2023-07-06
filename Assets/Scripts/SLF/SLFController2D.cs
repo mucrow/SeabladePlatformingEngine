@@ -20,6 +20,7 @@ namespace Seablade.SLF {
 
     BoxCollider2D _collider;
     RaycastOrigins _raycastOrigins;
+    // TODO i wish this was called CollisionInfo
     public CollisionInfo Collisions;
 
     void Start() {
@@ -71,6 +72,7 @@ namespace Seablade.SLF {
           }
 
           // SebLague: "only check the remaining rays for collisions if we are not climbing a slope"
+          // it is not clear what issue this fixes, if any
           if (!Collisions.ClimbingSlope || slopeAngle > _maxClimbAngle) {
             // move to contact position ?
             //
