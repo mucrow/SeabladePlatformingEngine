@@ -14,6 +14,10 @@ namespace Seablade.SLF {
     }
 
     void Update() {
+      if (_controller.Collisions.Above || _controller.Collisions.Below) {
+        _velocity.y = 0;
+      }
+
       Vector2 input = new Vector2(Input.GetAxisRaw("Horizontal"), Input.GetAxisRaw("Vertical"));
 
       _velocity.x = input.x * _moveSpeed;
