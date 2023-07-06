@@ -7,8 +7,9 @@ namespace Seablade.SLR {
     [SerializeField] float _gravity = -20f;
     [SerializeField] float _moveSpeed = 6f;
 
-    SLRController2D _controller;
     Vector3 _velocity;
+
+    SLRController2D _controller;
 
     void Start() {
       _controller = GetComponent<SLRController2D>();

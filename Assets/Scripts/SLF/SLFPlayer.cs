@@ -6,8 +6,10 @@ namespace Seablade.SLF {
     [SerializeField] float _gravity = -20f;
     [SerializeField] float _moveSpeed = 6f;
 
-    SLFController2D _controller;
+    float _jumpVelocity = 8f;
     Vector3 _velocity;
+
+    SLFController2D _controller;
 
     void Start() {
       _controller = GetComponent<SLFController2D>();
@@ -19,6 +21,10 @@ namespace Seablade.SLF {
       }
 
       Vector2 input = new Vector2(Input.GetAxisRaw("Horizontal"), Input.GetAxisRaw("Vertical"));
+
+      if (Input.GetKeyDown(KeyCode.Space) && _controller.Collisions.Below) {
+        _velocity.y = _jumpVelocity;
+      }
 
       _velocity.x = input.x * _moveSpeed;
       _velocity.y += _gravity * Time.deltaTime;
