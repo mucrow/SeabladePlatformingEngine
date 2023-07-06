@@ -98,6 +98,17 @@ namespace Seablade.SLR {
             // the player "stops at the lower stair" on the staircase
             rayLength = hit.distance;
 
+            // fixes jitter when reaching a wall while climbing a slope
+            if (Collisions.ClimbingSlope) {
+              // SLR NOTE 00000: please see comments below
+              // SebLague: "don't use slopeAngle here. it has to be Collisions.SlopeAngle"
+              // TODO that's gross , what's the difference ? should slopeAngle even been in scope?
+              // TODO SebLague makes it sound like ClimbSlope is ruining velocity.y and we're
+              // repairing it here. maybe the solution is to have better seperation of cases in
+              // this function
+              velocity.y = Mathf.Tan(Collisions.SlopeAngle * Mathf.Deg2Rad) * Mathf.Abs(velocity.x);
+            }
+
             // TODO consider if-statement here instead
             Collisions.Left = directionX == -1;
             Collisions.Right = directionX == 1;
@@ -139,6 +150,12 @@ namespace Seablade.SLR {
           // length should continually update to match the minimum hit distance so the player
           // "lands on the higher stair" on the staircase
           rayLength = hit.distance;
+
+          // fixes jitter when reaching a ceiling while climbing a slope
+          if (Collisions.ClimbingSlope) {
+            // see SLR NOTE 00000
+            velocity.x = velocity.y / Mathf.Tan(Collisions.SlopeAngle * Mathf.Deg2Rad) * Mathf.Sign(velocity.x);
+          }
 
           // TODO consider if-statement here instead
           Collisions.Below = directionY == -1;

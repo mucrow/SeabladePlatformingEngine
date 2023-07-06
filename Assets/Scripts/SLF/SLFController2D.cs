@@ -101,6 +101,7 @@ namespace Seablade.SLF {
 
             // fixes jitter when reaching a wall while climbing a slope
             if (Collisions.ClimbingSlope) {
+              // SLF NOTE 00000: please see comments below
               // SebLague: "don't use slopeAngle here. it has to be Collisions.SlopeAngle"
               // TODO that's gross , what's the difference ? should slopeAngle even been in scope?
               // TODO SebLague makes it sound like ClimbSlope is ruining velocity.y and we're
@@ -151,7 +152,9 @@ namespace Seablade.SLF {
           // "lands on the higher stair" on the staircase
           rayLength = hit.distance;
 
+          // fixes jitter when reaching a ceiling while climbing a slope
           if (Collisions.ClimbingSlope) {
+            // see SLF NOTE 00000
             velocity.x = velocity.y / Mathf.Tan(Collisions.SlopeAngle * Mathf.Deg2Rad) * Mathf.Sign(velocity.x);
           }
 
