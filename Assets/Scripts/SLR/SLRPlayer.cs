@@ -19,7 +19,7 @@ namespace Seablade.SLR {
 
       _velocity.x = input.x * _moveSpeed;
       _velocity.y += _gravity * Time.fixedDeltaTime;
-      // TODO pull Time.deltaTime into a variable (below is the second usage)
+      // TODO pull Time.fixedDeltaTime into a variable (below is the second usage)
       _controller.Move(_velocity * Time.fixedDeltaTime);
     }
   }
