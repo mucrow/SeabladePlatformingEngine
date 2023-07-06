@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace Seablade.SebLagueFaithful {
+namespace Seablade.SLF {
   [RequireComponent(typeof(SLFController2D))]
   public class SLFPlayer: MonoBehaviour {
     [SerializeField] float _gravity = -20f;
@@ -19,6 +19,7 @@ namespace Seablade.SebLagueFaithful {
       _velocity.x = input.x * _moveSpeed;
       _velocity.y += _gravity * Time.deltaTime;
       // TODO this (and perhaps other parts of Update()) should be in FixedUpdate()
+      // TODO pull Time.deltaTime into a variable (below is the second usage)
       _controller.Move(_velocity * Time.deltaTime);
     }
   }

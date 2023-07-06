@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace Seablade.SebLagueFaithful {
+namespace Seablade.SLF {
   [RequireComponent(typeof(BoxCollider2D))]
   public class SLFController2D: MonoBehaviour {
     // TODO consider renaming to obstacle layer. i think only the Obstacle layer is assigned to
