@@ -68,7 +68,15 @@ namespace Seablade.SLF {
           // TODO only calculate slopeAngle if i == 0 maybe
           float slopeAngle = Vector2.Angle(hit.normal, Vector2.up);
           if (i == 0 && slopeAngle <= _maxClimbAngle) {
+            float distanceToSlopeStart = 0f;
+            if (slopeAngle != Collisions.SlopeAngleOld) {
+              distanceToSlopeStart = hit.distance - _skinWidth;
+              // only climb slope with the velocity we'll have once we reach the slope
+              velocity.x -= distanceToSlopeStart * directionX;
+            }
             ClimbSlope(ref velocity, slopeAngle);
+            // add the distance to the slope back in after we're done climbing
+            velocity.x += distanceToSlopeStart * directionX;
           }
 
           // SebLague: "only check the remaining rays for collisions if we are not climbing a slope"
