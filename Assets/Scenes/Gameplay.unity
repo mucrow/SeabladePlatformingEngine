@@ -552,7 +552,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4983a2b2f137443a97a5195364558938, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _gravity: -20
+  _jumpHeight: 3.5
+  _timeToJumpApex: 0.4
   _moveSpeed: 6
 --- !u!1 &1183291757
 GameObject:
@@ -700,7 +701,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!4 &1371381363
 Transform:
   m_ObjectHideFlags: 0
@@ -749,7 +750,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!114 &1535474881
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1058,7 +1059,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 528c114e30d47914c93b1f16a570b471, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _gravity: -20
+  _jumpHeight: 3.5
+  _timeToJumpApex: 0.4
   _moveSpeed: 6
 --- !u!4 &1615360533
 Transform:

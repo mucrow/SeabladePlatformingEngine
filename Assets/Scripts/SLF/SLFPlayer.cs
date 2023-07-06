@@ -3,16 +3,24 @@ using UnityEngine;
 namespace Seablade.SLF {
   [RequireComponent(typeof(SLFController2D))]
   public class SLFPlayer: MonoBehaviour {
-    [SerializeField] float _gravity = -20f;
+    [SerializeField] float _jumpHeight = 4f;
+    [SerializeField] float _timeToJumpApex = 0.4f;
     [SerializeField] float _moveSpeed = 6f;
 
-    float _jumpVelocity = 8f;
+    float _gravity;
+    float _jumpVelocity;
     Vector3 _velocity;
 
     SLFController2D _controller;
 
     void Start() {
       _controller = GetComponent<SLFController2D>();
+
+      // TODO pull this out into a named function. calculating gravity and jump velocity from jump
+      // height and time to jump apex
+      _gravity = (-2f * _jumpHeight) / Mathf.Pow(_timeToJumpApex, 2);
+      _jumpVelocity = Mathf.Abs(_gravity) * _timeToJumpApex;
+      Debug.Log("Gravity: " + _gravity + " Jump Velocity: " + _jumpVelocity);
     }
 
     void Update() {
