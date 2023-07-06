@@ -17,6 +17,7 @@ namespace Seablade.SLR {
 
     BoxCollider2D _collider;
     RaycastOrigins _raycastOrigins;
+    public CollisionInfo Collisions;
 
     void Start() {
       _collider = GetComponent<BoxCollider2D>();
@@ -25,6 +26,7 @@ namespace Seablade.SLR {
 
     public void Move(Vector3 velocity) {
       UpdateRaycastOrigins();
+      Collisions.Reset();
 
       // TODO for both of these if-blocks:
       // - int to float conversion in condition
@@ -73,6 +75,10 @@ namespace Seablade.SLR {
           // floor, the ray length should continually update to match the minimum hit distance so
           // the player "stops at the lower stair" on the staircase
           rayLength = hit.distance;
+
+          // TODO consider if-statement here instead
+          Collisions.Left = directionX == -1;
+          Collisions.Right = directionX == 1;
         }
       }
     }
@@ -110,6 +116,10 @@ namespace Seablade.SLR {
           // length should continually update to match the minimum hit distance so the player
           // "lands on the higher stair" on the staircase
           rayLength = hit.distance;
+
+          // TODO consider if-statement here instead
+          Collisions.Below = directionY == -1;
+          Collisions.Above = directionY == 1;
         }
       }
     }
@@ -140,6 +150,20 @@ namespace Seablade.SLR {
       public Vector2 TopRight;
       public Vector2 BottomLeft;
       public Vector2 BottomRight;
+    }
+
+    public struct CollisionInfo {
+      public bool Above;
+      public bool Below;
+      public bool Left;
+      public bool Right;
+
+      public void Reset() {
+        Above = false;
+        Below = false;
+        Left = false;
+        Right = false;
+      }
     }
   }
 }
