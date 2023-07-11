@@ -163,6 +163,21 @@ namespace Seablade.SLF {
           Collisions.Above = directionY == 1;
         }
       }
+
+      if (Collisions.ClimbingSlope) {
+        float directionX = Mathf.Sign(velocity.x);
+        rayLength = Mathf.Abs(velocity.x) + _skinWidth;
+        Vector2 rayOrigin = ((directionX == -1) ? _raycastOrigins.BottomLeft : _raycastOrigins.BottomRight) + Vector2.up * velocity.y;
+        RaycastHit2D hit = Physics2D.Raycast(rayOrigin, Vector2.right * directionX, rayLength, _collisionMask);
+
+        if (hit) {
+          float slopeAngle = Vector2.Angle(hit.normal, Vector2.up);
+          if (slopeAngle != Collisions.SlopeAngle) {
+            velocity.x = (hit.distance - _skinWidth) * directionX;
+            Collisions.SlopeAngle = slopeAngle;
+          }
+        }
+      }
     }
 
     void ClimbSlope(ref Vector3 velocity, float slopeAngle) {
