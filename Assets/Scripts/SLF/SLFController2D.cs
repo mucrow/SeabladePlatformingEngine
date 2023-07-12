@@ -14,6 +14,7 @@ namespace Seablade.SLF {
     [SerializeField] int _verticalRayCount = 4;
 
     float _maxClimbAngle = 80f;
+    float _maxDescendAngle = 75f;
 
     float _horizontalRaySpacing;
     float _verticalRaySpacing;
@@ -31,7 +32,14 @@ namespace Seablade.SLF {
     public void Move(Vector3 velocity) {
       UpdateRaycastOrigins();
       Collisions.Reset();
+      Collisions.VelocityOld = velocity;
 
+      if (velocity.y < 0) {
+        // TODO the position in code of DescendSlope relative to ClimbSlope is kinda weird? it's
+        //      probably just cause we won't really be colliding by default when we should be
+        //      descending
+        DescendSlope(ref velocity);
+      }
       // TODO for both of these if-blocks:
       // - int to float conversion in condition
       // - let's not use refs for that velocity argument
@@ -68,6 +76,10 @@ namespace Seablade.SLF {
           // TODO only calculate slopeAngle if i == 0 maybe
           float slopeAngle = Vector2.Angle(hit.normal, Vector2.up);
           if (i == 0 && slopeAngle <= _maxClimbAngle) {
+            if (Collisions.DescendingSlope) {
+              Collisions.DescendingSlope = false;
+              velocity = Collisions.VelocityOld;
+            }
             float distanceToSlopeStart = 0f;
             // TODO i think epsilon comparison is a good idea here
             if (slopeAngle != Collisions.SlopeAngleOld) {
@@ -199,6 +211,33 @@ namespace Seablade.SLF {
       }
     }
 
+    void DescendSlope(ref Vector3 velocity) {
+      float directionX = Mathf.Sign(velocity.x);
+      // TODO float comparison, also could do `directionX < 0f` here
+      Vector2 rayOrigin = (directionX == -1) ? _raycastOrigins.BottomRight : _raycastOrigins.BottomLeft;
+      Debug.DrawRay(rayOrigin, directionX * Vector3.right * 100f, Color.red);
+      RaycastHit2D hit = Physics2D.Raycast(rayOrigin, Vector2.down, Mathf.Infinity, _collisionMask);
+
+      if (hit) {
+        float slopeAngle = Vector2.Angle(hit.normal, Vector2.up);
+        if (slopeAngle != 0 && slopeAngle <= _maxDescendAngle) {
+          // if we're trying to move downward on the slope...
+          if (Mathf.Sign(hit.normal.x) == directionX) {
+            if (hit.distance - _skinWidth <= Mathf.Tan(slopeAngle * Mathf.Deg2Rad) * Mathf.Abs(velocity.x)) {
+              float moveDistance = Mathf.Abs(velocity.x);
+              float descendVelocityY = Mathf.Sin(slopeAngle * Mathf.Deg2Rad) * moveDistance;
+              velocity.x = Mathf.Cos(slopeAngle * Mathf.Deg2Rad) * moveDistance * Mathf.Sign(velocity.x);
+              velocity.y -= descendVelocityY;
+
+              Collisions.SlopeAngle = slopeAngle;
+              Collisions.DescendingSlope = true;
+              Collisions.Below = true;
+            }
+          }
+        }
+      }
+    }
+
     void UpdateRaycastOrigins() {
       Bounds bounds = _collider.bounds;
       bounds.Expand(_skinWidth * -2f);
@@ -235,7 +274,9 @@ namespace Seablade.SLF {
       public bool Right;
 
       public bool ClimbingSlope;
+      public bool DescendingSlope;
       public float SlopeAngle, SlopeAngleOld;
+      public Vector3 VelocityOld;
 
       public void Reset() {
         Above = false;
@@ -243,6 +284,7 @@ namespace Seablade.SLF {
         Left = false;
         Right = false;
         ClimbingSlope = false;
+        DescendingSlope = false;
 
         // TODO ugh...maybe this method should not be called Reset() but rather Update() or
         // FixedUpdate()
